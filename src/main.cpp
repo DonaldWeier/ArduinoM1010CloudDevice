@@ -1,4 +1,7 @@
 
+//this is by default defined to 256 in PubSubClient if it is not alrady defined when the header inclusion is evaluated
+#define MQTT_MAX_PACKET_SIZE 2048
+
 #include <WiFiNINA.h>
 #include <PubSubClient.h>
 
