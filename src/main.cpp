@@ -21,7 +21,7 @@
 #include <ArduinoECCX08.h>
 #include <utility/ECCX08SelfSignedCert.h>
 #include <ArduinoMqttClient.h>
-#include <WiFiNINA.h> // change to #include <WiFi101.h> for MKR1000
+#include <WiFiNINA.h>
 
 #include "arduino_secrets.h"
 
