@@ -16,6 +16,7 @@
 
   This example code is in the public domain.
 */
+#include <Arduino.h>
 
 #include <ArduinoBearSSL.h>
 #include <ArduinoECCX08.h>
@@ -24,6 +25,7 @@
 #include <WiFiNINA.h>
 
 #include "arduino_secrets.h"
+#include "zone_lighting_controller.h"
 
 /////// Enter your sensitive data in arduino_secrets.h
 const char ssid[]        = SECRET_WIFI_SSID;
@@ -35,6 +37,7 @@ String     devicePass    = SECRET_DEVICE_PASSWORD;
 WiFiClient    wifiClient;            // Used for the TCP socket connection
 BearSSLClient sslClient(wifiClient); // Used for SSL/TLS connection, integrates with ECC508
 MqttClient    mqttClient(sslClient);
+ZoneLightingController controller;
 
 unsigned long lastMillis = 0;
 
@@ -109,6 +112,8 @@ void onMessageReceived(int messageSize) {
 void setup() {
   Serial.begin(9600);
   while (!Serial);
+
+  controller.Initialize();
 
   if (!ECCX08.begin()) {
     Serial.println("No ECCX08 present!");
