@@ -4,11 +4,12 @@
 #include <Arduino.h>
 #include <unordered_map>
 
+//DO NOT USE THE SPI PINS (8, 9, 10, or 4)
 static const int red_pwm_pin = 6;
 static const int green_pwm_pin = 7;
-static const int blue_pwm_pin = 8;
+static const int blue_pwm_pin = 1;
 static const int zone_1_selector_pin = 5;
-static const int zone_2_selector_pin = 4;
+static const int zone_2_selector_pin = 21;
 static const int zone_3_selector_pin = 3;
 static const int zone_4_selector_pin = 2;
 
