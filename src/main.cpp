@@ -27,6 +27,7 @@
 #include "arduino_secrets.h"
 #include "zone_lighting_controller.h"
 
+
 /////// Enter your sensitive data in arduino_secrets.h
 const char ssid[]        = SECRET_WIFI_SSID;
 const char pass[]        = SECRET_WIFI_PASS;
@@ -34,10 +35,13 @@ const char broker[]      = SECRET_BROKER;
 String     deviceId      = SECRET_DEVICE_ID;
 String     devicePass    = SECRET_DEVICE_PASSWORD;
 
+const int max_mqtt_buffer_len = 256;
+char mqtt_buffer[max_mqtt_buffer_len] = {0};
+
 WiFiClient    wifiClient;            // Used for the TCP socket connection
 BearSSLClient sslClient(wifiClient); // Used for SSL/TLS connection, integrates with ECC508
 MqttClient    mqttClient(sslClient);
-ZoneLightingController controller;
+ZoneLightingController lightingController;
 
 unsigned long lastMillis = 0;
 
@@ -99,21 +103,37 @@ void onMessageReceived(int messageSize) {
   Serial.print(mqttClient.messageTopic());
   Serial.print("', length ");
   Serial.print(messageSize);
-  Serial.println(" bytes:");
 
-  // use the Stream interface to print the contents
-  while (mqttClient.available()) {
-    Serial.print((char)mqttClient.read());
-  }
+ int buffer_len = mqttClient.available();
+
+ if(buffer_len == 0)
+ {
+  Serial.println("nothing in mqtt buffer");
+  return;
+ }
+ 
+ if(buffer_len > max_mqtt_buffer_len)
+ {
+  Serial.println("incoming message too big, update max_mqtt_buffer_len");
+  mqttClient.flush();
+  return;
+ }
+
+  mqttClient.read((uint8_t*)mqtt_buffer, buffer_len);
+  Serial.println(" bytes:");
+  Serial.print(mqtt_buffer);
   Serial.println();
   Serial.println();
+
+  //TODO: here is where we check the contents of 'mqtt_buffer' and determine what to call from lightingController 
+
 }
 
 void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  controller.Initialize();
+  lightingController.Initialize();
 
   if (!ECCX08.begin()) {
     Serial.println("No ECCX08 present!");
