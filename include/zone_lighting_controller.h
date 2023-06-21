@@ -1,6 +1,7 @@
 
 #pragma once
 #include <cstdint>
+#include <string>
 
 enum class Zone
 {
@@ -19,7 +20,8 @@ class ZoneLightingController
     ~ZoneLightingController() = default;
     void Initialize();
     void SetColor(int red, int green, int blue);
-    void HiglightZone(Zone zone);
+    void HighlightZone(Zone zone);
+    int HighlightZone(std::string str);
 
     private:
 

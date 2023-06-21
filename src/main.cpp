@@ -27,6 +27,8 @@
 #include "arduino_secrets.h"
 #include "zone_lighting_controller.h"
 
+#include <string> //C++ std::string
+#include <cstring> //C style string funcs
 
 /////// Enter your sensitive data in arduino_secrets.h
 const char ssid[]        = SECRET_WIFI_SSID;
@@ -49,7 +51,6 @@ unsigned long getTime() {
   // get the current time from the WiFi module
   return WiFi.getTime();
 }
-
 
 void connectWiFi() {
   Serial.print("Attempting to connect to SSID: ");
@@ -114,7 +115,7 @@ void onMessageReceived(int messageSize) {
  
  if(buffer_len > max_mqtt_buffer_len)
  {
-  Serial.println("incoming message too big, update max_mqtt_buffer_len");
+  Serial.println("incoming message too big, update max_mqtt_buffer_len and recompile");
   mqttClient.flush();
   return;
  }
@@ -125,11 +126,19 @@ void onMessageReceived(int messageSize) {
   Serial.println();
   Serial.println();
 
-  //TODO: here is where we check the contents of 'mqtt_buffer' and determine what to call from lightingController 
+  if(lightingController.HighlightZone(std::string(mqtt_buffer, strnlen(mqtt_buffer, max_mqtt_buffer_len))))
+  {
+    Serial.println("the command string <");
+    Serial.print(mqtt_buffer);
+    Serial.print("> did not equate to any known operation");
+  }
 
 }
 
 void setup() {
+
+  delay(5000); //initial delay so mistakes don't make a board unprogrammable
+
   Serial.begin(9600);
   while (!Serial);
 
@@ -192,5 +201,11 @@ void loop() {
     lastMillis = millis();
 
     publishMessage();
+
+    // lightingController.HighlightZone("Zone1");
+    // lightingController.HighlightZone("Zone2");
+    // lightingController.HighlightZone("Zone3");
+    // lightingController.HighlightZone("Zone4");
+    
   }
 }

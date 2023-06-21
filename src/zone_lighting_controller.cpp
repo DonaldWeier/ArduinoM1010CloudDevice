@@ -17,11 +17,19 @@ static const PinStatus select_logic_level = HIGH;
 static const PinStatus deselect_logic_level = LOW;
 
 
-static const std::unordered_map<const Zone, const int> lookup_table = {
+static const std::unordered_map<const Zone, const int> enum_to_pin_lut = {
     {Zone::Zone1, zone_1_selector_pin},
     {Zone::Zone2, zone_2_selector_pin},
     {Zone::Zone3, zone_3_selector_pin},
     {Zone::Zone4, zone_4_selector_pin}
+};
+
+static const std::unordered_map<std::string, const Zone> string_to_enum_lut = {
+    {"NoZone", Zone::NoZone},
+    {"Zone1", Zone::Zone1},
+    {"Zone2", Zone::Zone2},
+    {"Zone3", Zone::Zone3},
+    {"Zone4", Zone::Zone4}
 };
 
 ZoneLightingController::ZoneLightingController() :_active_zone(Zone::NoZone) 
@@ -48,7 +56,7 @@ void ZoneLightingController::SetColor(int red, int green, int blue)
     analogWrite(blue_pwm_pin, blue);
 }
 
-void ZoneLightingController::HiglightZone(Zone zone)
+void ZoneLightingController::HighlightZone(Zone zone)
 {
     if(zone == _active_zone){ return; }
 
@@ -67,13 +75,29 @@ void ZoneLightingController::HiglightZone(Zone zone)
     return;
 }
 
+int ZoneLightingController::HighlightZone(std::string str)
+{
+    bool entry_does_not_exist = (string_to_enum_lut.find(str) == string_to_enum_lut.end());
+
+    if(entry_does_not_exist)
+    {
+        return -1;
+    }
+
+    Zone the_intended_zone = string_to_enum_lut.at(str);
+
+    HighlightZone(the_intended_zone);
+
+    return 0;
+};
+
 void ZoneLightingController::InitializeZone(Zone zone)
 {
     if(zone == Zone::NoZone){ return; }
 
     //deselect THEN setup as an output to avoid flickering during power up
     DeselectZone(zone);
-    pinMode(lookup_table.at(zone), OUTPUT);
+    pinMode(enum_to_pin_lut.at(zone), OUTPUT);
 
 }
 
@@ -82,7 +106,7 @@ void ZoneLightingController::SelectZone(Zone zone)
     //guard clause not strictly necessary since this is a private function. Kept regardless.
     if(zone == Zone::NoZone){ return; }
 
-    digitalWrite(lookup_table.at(zone), select_logic_level);
+    digitalWrite(enum_to_pin_lut.at(zone), select_logic_level);
 }
 
 void ZoneLightingController::DeselectZone(Zone zone)
@@ -90,6 +114,6 @@ void ZoneLightingController::DeselectZone(Zone zone)
     //guard clause not strictly necessary since this is a private function. Kept regardless.    
     if(zone == Zone::NoZone){ return; }
 
-    digitalWrite(lookup_table.at(zone), deselect_logic_level);
+    digitalWrite(enum_to_pin_lut.at(zone), deselect_logic_level);
 }
 
