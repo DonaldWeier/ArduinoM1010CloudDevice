@@ -126,6 +126,14 @@ void onMessageReceived(int messageSize) {
   Serial.println();
   Serial.println();
 
+  bool the_message_was_understood_and_acted_on = lightingController.HighlightZone(std::string(mqtt_buffer, strnlen(mqtt_buffer, max_mqtt_buffer_len)));
+
+  mqttClient.beginMessage("devices/" + deviceId + "/messages/events/");
+  mqttClient.print("the command string <");
+  mqttClient.print(mqtt_buffer);
+  mqttClient.print("> was ");
+  mqttClient.print(the_message_was_understood_and_acted_on?"processed successfully":"processed unsuccessfully");
+  mqttClient.endMessage();
   if(lightingController.HighlightZone(std::string(mqtt_buffer, strnlen(mqtt_buffer, max_mqtt_buffer_len))))
   {
     Serial.println("the command string <");
