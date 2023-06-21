@@ -88,15 +88,15 @@ void connectMQTT() {
   mqttClient.subscribe("devices/" + deviceId + "/messages/devicebound/#");
 }
 
-void publishMessage() {
-  Serial.println("Publishing message");
+// void publishMessage() {
+//   Serial.println("Publishing message");
 
-  // send message, the Print interface can be used to set the message contents
-  mqttClient.beginMessage("devices/" + deviceId + "/messages/events/");
-  mqttClient.print("hello ");
-  mqttClient.print(millis());
-  mqttClient.endMessage();
-}
+//   // send message, the Print interface can be used to set the message contents
+//   mqttClient.beginMessage("devices/" + deviceId + "/messages/events/");
+//   mqttClient.print("hello ");
+//   mqttClient.print(millis());
+//   mqttClient.endMessage();
+// }
 
 void onMessageReceived(int messageSize) {
   // we received a message, print out the topic and contents
@@ -200,7 +200,7 @@ void loop() {
   if (millis() - lastMillis > 5000) {
     lastMillis = millis();
 
-    publishMessage();
+    // publishMessage();
 
     // lightingController.HighlightZone("Zone1");
     // lightingController.HighlightZone("Zone2");
